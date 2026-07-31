@@ -67,17 +67,17 @@ private:
 
     int reg_idx(int idx) const noexcept { return vmm_idx_upper_bound() - idx; }
 
-    Xmm xreg(int idx) const noexcept { return Xmm(reg_idx(idx)); }
-    Ymm yreg(int idx) const noexcept { return Ymm(reg_idx(idx)); }
-    Zmm zreg(int idx) const noexcept { return Zmm(reg_idx(idx)); }
-    Vmm vreg(int idx) const noexcept { return Vmm(reg_idx(idx)); }
-
     // Narrows a small, fixed-range value (SIMD lane index or blend mask) to the
     // Xbyak 8-bit immediate at the single instruction-emit boundary.
     static uint8_t to_imm_uint8_t(int v) noexcept {
         assert(v >= 0 && v <= UINT8_MAX);
         return static_cast<uint8_t>(v);
     }
+
+    Xmm xreg(int idx) const noexcept { return Xmm(reg_idx(idx)); }
+    Ymm yreg(int idx) const noexcept { return Ymm(reg_idx(idx)); }
+    Zmm zreg(int idx) const noexcept { return Zmm(reg_idx(idx)); }
+    Vmm vreg(int idx) const noexcept { return Vmm(reg_idx(idx)); }
 
     const Xbyak::AddressFrame &vmmword = (isa == sse41)  ? xword
             : utils::one_of(isa, avx, avx2, avx2_vnni_2) ? yword
