@@ -423,7 +423,9 @@ void jit_sse41_1x1_conv_kernel_f32_t::generate_diff_bias_loop(
         movups(diff_bias_ptr(i, 1), diff_bias_reg(i, 1));
     }
 
-    add(reg_diff_bias_data, load_loop_blk * jcp.oc_block * sizeof(float));
+    add(reg_diff_bias_data,
+            static_cast<uint32_t>(
+                    load_loop_blk * jcp.oc_block * sizeof(float)));
     mov(ptr[rsp + reg_diff_bias_data_stack_offt], reg_diff_bias_data);
 
     L(diff_bias_loop_out);
@@ -464,9 +466,9 @@ void jit_sse41_1x1_conv_kernel_f32_t::generate() {
         mov(reg_output_stride, ptr[param1 + GET_OFF(output_stride)]);
 
     auto generate_load_loop_body = [&](int load_loop_blk) {
-        const size_t offst_with_dw_conv
+        const dim_t offst_with_dw_conv
                 = get_load_loop_output_fwd_offset(jcp, load_loop_blk);
-        const size_t offst_wo_dw_conv
+        const dim_t offst_wo_dw_conv
                 = get_load_loop_output_fwd_offset(jcp, load_loop_blk, true);
         generate_bcast_loop(load_loop_blk);
         add(reg_load_data, load_loop_blk * jcp.load_loop_load_step);
@@ -474,7 +476,8 @@ void jit_sse41_1x1_conv_kernel_f32_t::generate() {
             case forward_training:
             case forward_inference:
                 add(reg_bias_data,
-                        load_loop_blk * jcp.oc_block * sizeof(float));
+                        static_cast<uint32_t>(
+                                load_loop_blk * jcp.oc_block * sizeof(float)));
                 add(reg_output_data, offst_with_dw_conv);
                 if (jcp.with_binary && jcp.with_dw_conv) {
                     mov(aux_reg_load_data, ptr[rsp + reg_dw_binary_output_off]);
@@ -485,7 +488,8 @@ void jit_sse41_1x1_conv_kernel_f32_t::generate() {
                 break;
             case backward_data:
                 add(reg_output_data,
-                        load_loop_blk * jcp.is * jcp.ic_block * sizeof(float));
+                        load_loop_blk * jcp.is * jcp.ic_block
+                                * static_cast<dim_t>(sizeof(float)));
                 break;
             case backward_weights:
                 for (int i = 0; i < load_loop_blk; i++)
