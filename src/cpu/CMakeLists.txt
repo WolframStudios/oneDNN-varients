@@ -96,6 +96,17 @@ if (NOT DNNL_TARGET_ARCH STREQUAL "X64" OR DNNL_X64_USE_ZEN)
     endif()
 endif()
 
+# C4267 is only fixed for x64 without ZenDNN, keep it suppressed elsewhere.
+if (NOT DNNL_TARGET_ARCH STREQUAL "X64" OR DNNL_X64_USE_ZEN)
+    if (MSVC)
+        if(${CMAKE_CXX_COMPILER_ID} STREQUAL MSVC)
+            # size_t -> int
+            append(CMAKE_C_FLAGS "/wd4267")
+            append(CMAKE_CXX_FLAGS "/wd4267")
+        endif()
+    endif()
+endif()
+
 if(CMAKE_CXX_COMPILER_ID STREQUAL "Intel")
     # to make computations more stable and to align the jitted code
     # with the reference one use precise division and square root
