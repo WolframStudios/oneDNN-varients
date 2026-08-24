@@ -2127,7 +2127,8 @@ private:
     const Address ARG_A = ptr[rsp + OFFSET_SHADOWSPACE + STACKSIZE];
     const Address ARG_LDA
             = qword[rsp + OFFSET_SHADOWSPACE + sizeof(float *) + STACKSIZE];
-    const int stackOffset = OFFSET_SHADOWSPACE + sizeof(float *) + STACKSIZE;
+    const int stackOffset = static_cast<int>(
+            OFFSET_SHADOWSPACE + sizeof(float *) + STACKSIZE);
     const Reg64 A = rsi;
     const Reg64 LDA = rdi;
 #else
